@@ -14,7 +14,7 @@
 <link href="https://fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
 <style>
 
-/* ── TOKENS ── */
+/* ── DARK THEME (default) ── */
 :root {
 –bg:       #0c0a07;
 –bg1:      #131109;
@@ -29,15 +29,38 @@
 –faint:    #2a2618;
 –faint2:   #383220;
 –live:     #c94e28;
+–nav-bg:   rgba(12,10,7,.92);
+–text-main:#ede5d0;
+}
+
+/* ── LIGHT THEME ── */
+:root.light {
+–bg:       #f5f0e6;
+–bg1:      #ede7d9;
+–bg2:      #e4ddd0;
+–bg3:      #d9d0c0;
+–gold:     #8a6830;
+–gold-lo:  #6b5530;
+–gold-hi:  #a07838;
+–cream:    #1c1814;
+–muted:    #3d3530;
+–stone:    #5c5044;
+–faint:    #c8bfb0;
+–faint2:   #b8ae9e;
+–live:     #c94e28;
+–nav-bg:   rgba(245,240,230,.95);
+–text-main:#1c1814;
 }
 
 *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
 html { font-size:16px; -webkit-font-smoothing:antialiased; scroll-behavior:smooth; background:#0c0a07; }
+html.light { background:#f5f0e6; }
 body {
-background: #0c0a07 !important;
-color: #ede5d0;
+background: var(–bg);
+color: var(–text-main);
 font-family: ‘DM Sans’, Georgia, serif;
 overflow-x: hidden;
+transition: background .4s ease, color .4s ease;
 }
 
 /* ── GRAIN ── */
@@ -57,7 +80,7 @@ padding: 0 48px;
 transition: background .4s, border-color .4s;
 }
 nav.scrolled {
-background: rgba(12,10,7,.92);
+background: var(–nav-bg);
 backdrop-filter: blur(16px);
 border-bottom: 1px solid var(–faint);
 }
@@ -482,6 +505,85 @@ nav { padding: 0 24px; }
 .verse-strip { padding: 36px 24px; }
 footer { flex-direction: column; gap: 16px; text-align: center; padding: 32px 24px; }
 }
+
+/* ── THEME TOGGLE ── */
+.theme-toggle {
+width: 36px; height: 36px; border-radius: 9px;
+background: var(–bg2); border: 1px solid var(–faint);
+color: var(–stone); cursor: pointer;
+display: flex; align-items: center; justify-content: center;
+transition: all .25s; flex-shrink: 0;
+}
+.theme-toggle:hover {
+border-color: var(–gold-lo); color: var(–gold);
+background: var(–bg3);
+}
+
+/* Light mode hero glow */
+:root.light .hero-glow {
+background: radial-gradient(ellipse,
+rgba(139,104,48,.12) 0%,
+rgba(139,104,48,.05) 35%,
+transparent 68%);
+}
+
+/* Light mode cross line */
+:root.light .hero-cross-v {
+background: linear-gradient(180deg,
+transparent 0%,
+rgba(107,85,48,.06) 30%,
+rgba(107,85,48,.12) 50%,
+rgba(107,85,48,.06) 70%,
+transparent 100%);
+}
+
+/* Light mode hero verse */
+:root.light .hero-verse {
+color: rgba(28,24,20,.5);
+}
+
+/* Light mode verse strip */
+:root.light .verse-strip-text {
+color: rgba(28,24,20,.4);
+}
+
+/* Light mode pillar grid */
+:root.light .pillar-grid {
+background: var(–faint);
+border-color: var(–faint);
+box-shadow: 0 4px 40px rgba(0,0,0,.08);
+}
+
+/* Light mode waitlist glow */
+:root.light .waitlist-glow {
+background: radial-gradient(ellipse,
+rgba(139,104,48,.08) 0%,
+transparent 65%);
+}
+
+/* Light mode form inputs */
+:root.light .wl-input,
+:root.light .wl-select {
+background: #fff;
+border-color: var(–faint);
+color: var(–cream);
+}
+:root.light .wl-input::placeholder { color: var(–stone); }
+
+/* Light mode nav */
+:root.light nav { border-bottom-color: var(–faint); }
+
+/* Light mode footer */
+:root.light footer { border-top-color: var(–faint); }
+:root.light .footer-brand { color: rgba(107,85,48,.5); }
+
+/* Smooth theme transition on all elements */
+*, *::before, *::after {
+transition: background-color .35s ease, border-color .35s ease, color .35s ease;
+}
+/* But don’t transition transforms/opacity (breaks animations) */
+.reveal, .hero-eyebrow, .hero-title, .hero-divider, .hero-verse, .hero-scroll,
+.pillar, .theme-toggle { transition: background-color .35s ease, border-color .35s ease, color .35s ease, transform .25s ease, opacity .9s ease; }
 </style>
 
 </head>
@@ -494,9 +596,20 @@ footer { flex-direction: column; gap: 16px; text-align: center; padding: 32px 24
     <span class="nav-brand-main">Verbum Scribe</span>
     <span class="nav-brand-sub">verbumscribe.app</span>
   </div>
-  <button class="nav-cta" onclick="document.getElementById('waitlist').scrollIntoView({behavior:'smooth'})">
-    Join the Waitlist
-  </button>
+  <div style="display:flex;align-items:center;gap:12px;">
+    <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" title="Switch theme" aria-label="Toggle light/dark mode">
+      <svg class="icon-moon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+        <path d="M21 12.79A9 9 0 1 1 11.21 3a7 7 0 0 0 9.79 9.79z" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <svg class="icon-sun" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="display:none">
+        <circle cx="12" cy="12" r="5"/>
+        <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" stroke-linecap="round"/>
+      </svg>
+    </button>
+    <button class="nav-cta" onclick="document.getElementById('waitlist').scrollIntoView({behavior:'smooth'})">
+      Join the Waitlist
+    </button>
+  </div>
 </nav>
 
 <!-- ══════════════════════
@@ -775,6 +888,42 @@ function showSuccess() {
   const s = document.getElementById('wlSuccess');
   s.classList.add('show');
 }
+
+
+/* ── THEME TOGGLE ── */
+function toggleTheme() {
+  const html = document.documentElement;
+  const isLight = html.classList.toggle('light');
+  localStorage.setItem('verbum_theme', isLight ? 'light' : 'dark');
+  updateToggleIcon(isLight);
+}
+
+function updateToggleIcon(isLight) {
+  const moon = document.querySelector('.icon-moon');
+  const sun  = document.querySelector('.icon-sun');
+  if (isLight) {
+    moon.style.display = 'none';
+    sun.style.display  = 'block';
+  } else {
+    moon.style.display = 'block';
+    sun.style.display  = 'none';
+  }
+}
+
+// Apply saved theme on load — before paint
+(function() {
+  const saved = localStorage.getItem('verbum_theme');
+  if (saved === 'light') {
+    document.documentElement.classList.add('light');
+    document.documentElement.style.background = '#f5f0e6';
+  }
+})();
+
+// Sync icon after DOM ready
+document.addEventListener('DOMContentLoaded', function() {
+  const isLight = document.documentElement.classList.contains('light');
+  updateToggleIcon(isLight);
+});
 
 </script>
 
